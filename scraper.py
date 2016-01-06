@@ -28,5 +28,10 @@ curl.perform()
 curl.close()
 html = buffer.getvalue().decode('iso-8859-1')
 
-# set up parser
+################################################################################
+# Set up parser and find links
+################################################################################
 soup = BeautifulSoup(html, 'html.parser')
+anchor_tags = soup.find_all("a")
+
+anchor_text = [ a.getText() for a in anchor_tags ]

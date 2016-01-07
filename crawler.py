@@ -10,15 +10,36 @@ import re
 ################################################################################
 # Global variables
 ################################################################################
-url = "https://scholar.google.com/scholar?q=rtxi"
-terms = [ 'rtxi', 'RTXI', 'real-time experiment interface']
+url_queue = ["https://scholar.google.com/scholar?q=rtxi"]
+terms = ['rtxi', 'RTXI', '(R|r)eal( |-)time (e|E)(X|x)periment (I|i)nterface']
+
+################################################################################
+# Functions
+################################################################################
+def parse_html(html):
+    soup = BeautifulSoup(html, "html.parser")
+    anchor_tags = soup.find_all("a")
+    anchor_links = []
+    anchor_text = []
+    for a in anchor_tags:
+        try: 
+            anchor_links.append(a['href'])
+            anchor_text.append(a.getText())
+        except KeyError:
+            print(a)
+    return (anchor_text, anchor_links)
+
+def filter_links(text, links, terms):
+    findings = [ (text[i], links[i]) for i in range(len(text)) 
+                 for term in terms if re.search(term, text[i]) ]
+    return findings
 
 ################################################################################
 # Initialize buffers and download initial page
 ################################################################################
 buffer = BytesIO()
 curl = pycurl.Curl()
-curl.setopt(pycurl.URL, url)
+curl.setopt(pycurl.URL, url[0])
 curl.setopt(pycurl.SSL_VERIFYPEER, 1)
 curl.setopt(pycurl.SSL_VERIFYHOST, 2)
 curl.setopt(curl.WRITEDATA, buffer)
@@ -29,9 +50,13 @@ curl.close()
 html = buffer.getvalue().decode('iso-8859-1')
 
 ################################################################################
-# Set up parser and find links
+# Parse HTML and get new links
 ################################################################################
-soup = BeautifulSoup(html, 'html.parser')
-anchor_tags = soup.find_all("a")
+text, links = parse_html(html)
+tuples = filter_links(text, links, terms)
 
-anchor_text = [ a.getText() for a in anchor_tags ]
+
+################################################################################
+# Unused code
+################################################################################
+#[ item for item in text for term in terms if re.search(term, item) ]

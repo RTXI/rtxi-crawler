@@ -39,7 +39,7 @@ def filter_links(text, links, terms):
 ################################################################################
 buffer = BytesIO()
 curl = pycurl.Curl()
-curl.setopt(pycurl.URL, url[0])
+curl.setopt(pycurl.URL, url_queue[0])
 curl.setopt(pycurl.SSL_VERIFYPEER, 1)
 curl.setopt(pycurl.SSL_VERIFYHOST, 2)
 curl.setopt(curl.WRITEDATA, buffer)
@@ -54,6 +54,9 @@ html = buffer.getvalue().decode('iso-8859-1')
 ################################################################################
 text, links = parse_html(html)
 tuples = filter_links(text, links, terms)
+
+for thing in tuples:
+    print(thing)
 
 
 ################################################################################

@@ -5,4 +5,4 @@
 
 Simple web crawler and scraper to find papers that reference RTXI. 
 
-Run: `./crawler.py`
+Run: `./crawler.py > crawler.log`

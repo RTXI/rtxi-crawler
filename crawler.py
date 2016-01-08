@@ -11,16 +11,20 @@ import random
 ################################################################################
 # Global variables
 ################################################################################
+
 url_queue = ["https://scholar.google.com/scholar?q=rtxi", 
              "http://link.springer.com/search?query=rtxi" ]
-all_results = []
+parsed_pages = []
+unparsed_pages = []
 terms = [ 'rtxi', 'real( |-)time experiment interface']
+
 
 ################################################################################
 # Define module class
 ################################################################################
+
 class Paper:
-   def __init__(self, link, parent_link):
+   def __init__(self, link, parent_link=""):
       self.link = self.link
       self.parent_link = parent_link
       self.check_link()
@@ -32,7 +36,7 @@ class Paper:
       self.abstract = ""
 
    def check_link():
-      if self.link[0:4] != 'http' and self.link[0] == '/'
+      if self.link[0:4] != 'http' and self.link[0] == '/' and parent_link
          blubs = self.parent_link.split("//")
          blubs = [ blub for blub in blubs if blub ]
          blubs = blubs.split("/")
@@ -112,6 +116,13 @@ def download_page(url):
    time.sleep(5+random.randrange(0,10)) # good manners
    return html
 
+def is_duplicate(url, all_urls):
+   if url in all_urls:
+      return true
+   else
+      return false
+
+
 ################################################################################
 # Main body
 ################################################################################
@@ -119,11 +130,11 @@ def download_page(url):
 idx = 0
 while url_queue and idx < 10:
    url = url_queue.pop(0)
-   print("Downloading ", url)
+   #print("Downloading ", url)
    html = download_page(url)
    text, links = parse_html(html)
    results = filter_links(text, links, terms)
-   print("Found links: ", [ result[1] for result in results ])
+   #print("Found links: ", [ result[1] for result in results ])
    url_queue = url_queue + [ result[1] for result in results ]
    all_results = all_results + results
    idx += 1
@@ -131,7 +142,9 @@ while url_queue and idx < 10:
 print("steps: ", idx)
 print("found: ", results)
 
+
 ################################################################################
 # Unused code
 ################################################################################
+
 

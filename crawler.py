@@ -21,36 +21,36 @@ terms = [ 'rtxi', 'RTXI',
 # Functions
 ################################################################################
 def parse_html(html):
-    soup = BeautifulSoup(html, "html.parser")
-    anchor_tags = soup.find_all("a")
-    anchor_links = []
-    anchor_text = []
-    for a in anchor_tags:
-        try: 
-            anchor_links.append(a['href'])
-            anchor_text.append(a.getText())
-        except KeyError:
-            print(a)
-    return (anchor_text, anchor_links)
+   soup = BeautifulSoup(html, "html.parser")
+   anchor_tags = soup.find_all("a")
+   anchor_links = []
+   anchor_text = []
+   for a in anchor_tags:
+      try: 
+         anchor_links.append(a['href'])
+         anchor_text.append(a.getText())
+      except KeyError:
+         print(a)
+   return (anchor_text, anchor_links)
 
 def filter_links(text, links, terms):
-    findings = [ (text[i], links[i]) for i in range(len(text)) 
-                 for term in terms if re.search(term, text[i]) 
-                 if '.pdf' not in links[i] ]
-    return findings
+   findings = [ (text[i], links[i]) for i in range(len(text)) 
+                for term in terms if re.search(term, text[i]) 
+                if '.pdf' not in links[i] ]
+   return findings
 
 def download_page(url):
-    buffer = BytesIO()
-    curl = pycurl.Curl()
-    curl.setopt(pycurl.URL, url)
-    curl.setopt(pycurl.SSL_VERIFYPEER, 1)
-    curl.setopt(pycurl.SSL_VERIFYHOST, 2)
-    curl.setopt(curl.WRITEDATA, buffer)
-    curl.perform()
-    curl.close()
-    html = buffer.getvalue().decode('iso-8859-1')
-    time.sleep(5+random.randrange(0,10)) # good manners
-    return html
+   buffer = BytesIO()
+   curl = pycurl.Curl()
+   curl.setopt(pycurl.URL, url)
+   curl.setopt(pycurl.SSL_VERIFYPEER, 1)
+   curl.setopt(pycurl.SSL_VERIFYHOST, 2)
+   curl.setopt(curl.WRITEDATA, buffer)
+   curl.perform()
+   curl.close()
+   html = buffer.getvalue().decode('iso-8859-1')
+   time.sleep(5+random.randrange(0,10)) # good manners
+   return html
 
 ################################################################################
 # Main body
@@ -58,15 +58,15 @@ def download_page(url):
 
 idx = 0
 while url_queue and idx < 10:
-    url = url_queue.pop(0)
-    print("Downloading ", url)
-    html = download_page(url)
-    text, links = parse_html(html)
-    results = filter_links(text, links, terms)
-    print("Found links: ", [ result[1] for result in results ])
-    url_queue = url_queue + [ result[1] for result in results ]
-    all_results = all_results + results
-    idx += 1
+   url = url_queue.pop(0)
+   print("Downloading ", url)
+   html = download_page(url)
+   text, links = parse_html(html)
+   results = filter_links(text, links, terms)
+   print("Found links: ", [ result[1] for result in results ])
+   url_queue = url_queue + [ result[1] for result in results ]
+   all_results = all_results + results
+   idx += 1
 
 print("steps: ", idx)
 print("found: ", results)

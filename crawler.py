@@ -14,8 +14,7 @@ import random
 url_queue = ["https://scholar.google.com/scholar?q=rtxi", 
              "http://link.springer.com/search?query=rtxi" ]
 all_results = []
-terms = [ 'rtxi', 'RTXI', 
-          '(R|r)eal( |-)(t|T)ime (e|E)(X|x)periment (I|i)nterface']
+terms = [ 'rtxi', 'real( |-)time experiment interface']
 
 ################################################################################
 # Functions
@@ -34,9 +33,12 @@ def parse_html(html):
    return (anchor_text, anchor_links)
 
 def filter_links(text, links, terms):
-   findings = [ (text[i], links[i]) for i in range(len(text)) 
-                for term in terms if re.search(term, text[i]) 
+   findings = [ [text[i], links[i]] for i in range(len(text)) 
+                for term in terms if re.search(term, text[i], re.IGNORECASE) 
                 if '.pdf' not in links[i] ]
+   for idx in range(len(findings)):
+      if findings[idx][1][0:4] != 'http':
+         findings[idx][1] = 'http:/' + findings[idx][1]
    return findings
 
 def download_page(url):
@@ -46,7 +48,9 @@ def download_page(url):
    curl.setopt(pycurl.SSL_VERIFYPEER, 1)
    curl.setopt(pycurl.SSL_VERIFYHOST, 2)
    curl.setopt(curl.WRITEDATA, buffer)
+   curl.setopt(curl.FOLLOWLOCATION, True)
    curl.perform()
+   print(curl.getinfo(pycurl.HTTP_CODE), curl.getinfo(pycurl.EFFECTIVE_URL))
    curl.close()
    html = buffer.getvalue().decode('iso-8859-1')
    time.sleep(5+random.randrange(0,10)) # good manners

@@ -20,15 +20,26 @@ terms = [ 'rtxi', 'real( |-)time experiment interface']
 # Define module class
 ################################################################################
 class Paper:
-   def __init__(self, parent_link):
+   def __init__(self, link, parent_link):
+      self.link = self.link
+      self.parent_link = parent_link
+      self.check_link()
+
       self.title = ""
-      self.link = ""
       self.authors = []
       self.reference = ""
       self.date = ""
       self.abstract = ""
-      self.parent_link = parent_link
 
+   def check_link():
+      if self.link[0:4] != 'http' and self.link[0] == '/'
+         blubs = self.parent_link.split("//")
+         blubs = [ blub for blub in blubs if blub ]
+         blubs = blubs.split("/")
+         blubs = [ blub for blub in blubs if blub ]
+         tld = blubs[0]
+         self.link = tld + self.link
+                  
    def print_html():
       slug = slugify(self.title) + ".html"
       f = open(slug, "w")

@@ -11,9 +11,11 @@ import random
 ################################################################################
 # Global variables
 ################################################################################
-url_queue = ["https://scholar.google.com/scholar?q=rtxi"]
+url_queue = ["https://scholar.google.com/scholar?q=rtxi", 
+             "http://link.springer.com/search?query=rtxi" ]
 all_results = []
-terms = ['rtxi', 'RTXI', '(R|r)eal( |-)time (e|E)(X|x)periment (I|i)nterface']
+terms = [ 'rtxi', 'RTXI', 
+          '(R|r)eal( |-)(t|T)ime (e|E)(X|x)periment (I|i)nterface']
 
 ################################################################################
 # Functions

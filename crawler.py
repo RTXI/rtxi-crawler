@@ -17,8 +17,51 @@ all_results = []
 terms = [ 'rtxi', 'real( |-)time experiment interface']
 
 ################################################################################
-# Functions
+# Define module class
 ################################################################################
+class Paper:
+   def __init__(self, parent_link):
+      self.title = ""
+      self.link = ""
+      self.authors = []
+      self.reference = ""
+      self.date = ""
+      self.abstract = ""
+      self.parent_link = parent_link
+
+   def print_html():
+      slug = slugify(self.title) + ".html"
+      f = open(slug, "w")
+      f.write("---")
+      f.write("title: ", self.title)
+      f.write("category: papers")
+      f.write("layout: paper")
+      f.write("reference: ", self.reference)
+      f.write("authors:")
+      for author in self.authors:
+         f.write(" - ", author)
+      f.write("link: ", self.link)
+      f.write("---")
+      f.write("")
+      f.write(self.abstract)
+      f.close()
+      
+
+################################################################################
+# Define global helper functions
+################################################################################
+
+def slugify(s):
+   s = s.lower()
+   for c in [' ', '-', '.', '/']:
+       s = s.replace(c, '_')
+   s = re.sub('\W', '', s)
+   s = s.replace('_', ' ')
+   s = re.sub('\s+', ' ', s)
+   s = s.strip()
+   s = s.replace(' ', '-')
+   return s
+
 def parse_html(html):
    soup = BeautifulSoup(html, "html.parser")
    anchor_tags = soup.find_all("a")
@@ -49,8 +92,10 @@ def download_page(url):
    curl.setopt(pycurl.SSL_VERIFYHOST, 2)
    curl.setopt(curl.WRITEDATA, buffer)
    curl.setopt(curl.FOLLOWLOCATION, True)
-   curl.perform()
-   print(curl.getinfo(pycurl.HTTP_CODE), curl.getinfo(pycurl.EFFECTIVE_URL))
+   try:
+      curl.perform()
+   except:
+      print("Download ERROR: ", url)
    curl.close()
    html = buffer.getvalue().decode('iso-8859-1')
    time.sleep(5+random.randrange(0,10)) # good manners

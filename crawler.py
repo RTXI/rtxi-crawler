@@ -3,14 +3,16 @@
 from bs4 import BeautifulSoup
 from io import BytesIO
 import pycurl
-import sqlite3 as sql
-import sys
 import re
+import time
+import random
+#import sqlite3 as sql
 
 ################################################################################
 # Global variables
 ################################################################################
 url_queue = ["https://scholar.google.com/scholar?q=rtxi"]
+all_results = []
 terms = ['rtxi', 'RTXI', '(R|r)eal( |-)time (e|E)(X|x)periment (I|i)nterface']
 
 ################################################################################
@@ -31,35 +33,43 @@ def parse_html(html):
 
 def filter_links(text, links, terms):
     findings = [ (text[i], links[i]) for i in range(len(text)) 
-                 for term in terms if re.search(term, text[i]) ]
+                 for term in terms if re.search(term, text[i]) 
+                 if '.pdf' not in links[i] ]
     return findings
 
-################################################################################
-# Initialize buffers and download initial page
-################################################################################
-buffer = BytesIO()
-curl = pycurl.Curl()
-curl.setopt(pycurl.URL, url_queue[0])
-curl.setopt(pycurl.SSL_VERIFYPEER, 1)
-curl.setopt(pycurl.SSL_VERIFYHOST, 2)
-curl.setopt(curl.WRITEDATA, buffer)
-
-# download the page and write bytecode to buffer
-curl.perform()
-curl.close()
-html = buffer.getvalue().decode('iso-8859-1')
+def download_page(url):
+    buffer = BytesIO()
+    curl = pycurl.Curl()
+    curl.setopt(pycurl.URL, url)
+    curl.setopt(pycurl.SSL_VERIFYPEER, 1)
+    curl.setopt(pycurl.SSL_VERIFYHOST, 2)
+    curl.setopt(curl.WRITEDATA, buffer)
+    curl.perform()
+    curl.close()
+    html = buffer.getvalue().decode('iso-8859-1')
+    time.sleep(5+random.randrange(0,10)) # good manners
+    return html
 
 ################################################################################
-# Parse HTML and get new links
+# Main body
 ################################################################################
-text, links = parse_html(html)
-tuples = filter_links(text, links, terms)
 
-for thing in tuples:
-    print(thing)
+idx = 0
+while url_queue and idx < 10:
+    url = url_queue.pop(0)
+    print("Downloading ", url)
+    html = download_page(url)
+    text, links = parse_html(html)
+    results = filter_links(text, links, terms)
+    print("Found links: ", [ result[1] for result in results ])
+    url_queue = url_queue + [ result[1] for result in results ]
+    all_results = all_results + results
+    idx += 1
 
+print("steps: ", idx)
+print("found: ", results)
 
 ################################################################################
 # Unused code
 ################################################################################
-#[ item for item in text for term in terms if re.search(term, item) ]
+
